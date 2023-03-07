@@ -7,10 +7,12 @@
 
 void ExitProgram();
 
-struct BatchRenderGL : public IBatchRender
+struct BatchRenderGL : public IRender
 {
   ~BatchRenderGL() override { ExitProgram(); }
   
+  unsigned int AddImage(Image2D a_img) override;
+
   void BeginRenderPass(Image2D fb) override;
   void Draw(PipelineStateObject a_state, Geom a_geom) override;
   void EndRenderPass(Image2D fb) override;
@@ -96,7 +98,7 @@ void ExitProgram()
 }
 
 
-std::shared_ptr<IBatchRender> MakeReferenceImpl() 
+std::shared_ptr<IRender> MakeReferenceImpl() 
 { 
   CreateWindow(512,512);
   SetupGL();
@@ -136,6 +138,19 @@ void BatchRenderGL::BeginRenderPass(Image2D fb)
   glEnable (GL_DEPTH_TEST);
 }
 
+unsigned int BatchRenderGL::AddImage(Image2D a_img)
+{
+  GLuint texture = (GLuint)(-1);
+  glGenTextures(1, &texture);					// Create The Texture
+
+  glBindTexture(GL_TEXTURE_2D, texture);
+  glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, a_img.width, a_img.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, a_img.data);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+  return (unsigned int)texture;
+}
+
 void BatchRenderGL::Draw(PipelineStateObject a_state, Geom a_geom)
 {
   float tempMat[16];  
@@ -146,18 +161,27 @@ void BatchRenderGL::Draw(PipelineStateObject a_state, Geom a_geom)
   glMatrixMode(GL_MODELVIEW);
   transposeMatrix(a_state.worldViewMatrix, tempMat); // GL assume col-major matrices (which is usually better), while in our API thet are row-major
   glLoadMatrixf(tempMat);
-
-  glDisable(GL_TEXTURE_2D);
   
+  if(a_state.mode == MODE_TEXURE_3D)
+  {
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, a_state.imgId);
+  }
+  else
+  {
+    glDisable(GL_TEXTURE_2D);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY_SIZE);
+  }
+
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY_SIZE);
   glEnableClientState(GL_COLOR_ARRAY);
   glEnableClientState(GL_VERTEX_ARRAY);
 
   glColorPointer (4, GL_FLOAT, 0,  a_geom.vcol4f);
   glVertexPointer(4, GL_FLOAT, 0,  a_geom.vpos4f);  
-  glDrawElements(GL_TRIANGLES, a_geom.primsNum*3, GL_UNSIGNED_INT, a_geom.indices);
+  glTexCoordPointer(2, GL_FLOAT, 0, a_geom.vtex2f);
 
-  glDisableClientState(GL_COLOR_ARRAY);
-  glDisableClientState(GL_VERTEX_ARRAY);
+  glDrawElements (GL_TRIANGLES, a_geom.primsNum*3, GL_UNSIGNED_INT, a_geom.indices);
 }
 
 void BatchRenderGL::EndRenderPass(Image2D fb)

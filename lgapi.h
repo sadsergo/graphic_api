@@ -1,14 +1,14 @@
 #pragma once 
 
-enum RENDER_MODE { MODE_FILL_COLOR = 0,
-                   MODE_VERT_COLOR = 1,
-                   MODE_TEXURE_3D  = 2, };
+enum RENDER_MODE { MODE_VERT_COLOR = 0,
+                   MODE_TEXURE_3D  = 1, };
 
 struct PipelineStateObject
 {
   float worldViewMatrix[16]; ///< by rows, i.e. M[0], M[1], M[2], M[3] is the first row of the matrix
   float projMatrix[16];      ///< by rows, i.e. M[0], M[1], M[2], M[3] is the first row of the matrix
-  RENDER_MODE mode;
+  RENDER_MODE  mode  = MODE_VERT_COLOR;
+  unsigned int imgId = 0;
 };
 
 enum GEOM_TYPE { GEOM_TRIANGLES = 1, GEOM_QUADS = 2 };
@@ -35,11 +35,13 @@ struct Image2D
   unsigned int  height; 
 };
 
-struct IBatchRender
+struct IRender
 {
-  IBatchRender(){}
-  virtual ~IBatchRender(){}
+  IRender(){}
+  virtual ~IRender(){}
   
+  virtual unsigned int AddImage(Image2D a_img) = 0;
+
   virtual void BeginRenderPass(Image2D fb) = 0;
   virtual void Draw(PipelineStateObject a_state, Geom a_geom) = 0;
   virtual void EndRenderPass(Image2D fb) = 0;
