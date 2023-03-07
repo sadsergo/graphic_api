@@ -15,10 +15,10 @@ enum GEOM_TYPE { GEOM_TRIANGLES = 1, GEOM_QUADS = 2 };
 
 struct Geom
 {
-  float*        vpos4f  = nullptr; ///< quads of vertex coordinates for vertex positions x,y,z,w; w is unused
-  float*        vcol4f  = nullptr; ///< quads of vertex color attributes r,g,b,a; a is unused
-  float*        vtex2f  = nullptr; ///< pairs of x and y coordinates
-  unsigned int* indices = nullptr; ///< index buffer of size 3*primsNum for triangle meshes and 4*primsNum for qual meshes
+  const float*        vpos4f  = nullptr; ///< quads of vertex coordinates for vertex positions x,y,z,w; w is unused
+  const float*        vcol4f  = nullptr; ///< quads of vertex color attributes r,g,b,a; a is unused
+  const float*        vtex2f  = nullptr; ///< pairs of x and y coordinates
+  const unsigned int* indices = nullptr; ///< index buffer of size 3*primsNum for triangle meshes and 4*primsNum for qual meshes
 
   unsigned int vertNum  = 0;
   unsigned int primsNum = 0;
@@ -39,6 +39,8 @@ struct IBatchRender
 {
   IBatchRender(){}
   virtual ~IBatchRender(){}
-
-  virtual void Render(PipelineStateObject a_state, Geom a_geom, FrameBuffer fb) = 0;
+  
+  virtual void BeginRenderPass(FrameBuffer fb) = 0;
+  virtual void Draw(PipelineStateObject a_state, Geom a_geom) = 0;
+  virtual void EndRenderPass(FrameBuffer fb) = 0;
 };

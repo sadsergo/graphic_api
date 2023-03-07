@@ -1,5 +1,3 @@
-#pragma once 
-
 #include "lgapi.h"
 #include <memory>
 
@@ -12,8 +10,10 @@ void ExitProgram();
 struct BatchRenderGL : public IBatchRender
 {
   ~BatchRenderGL() override { ExitProgram(); }
-
-  void Render(PipelineStateObject a_state, Geom a_geom, FrameBuffer fb) override;
+  
+  void BeginRenderPass(FrameBuffer fb) override;
+  void Draw(PipelineStateObject a_state, Geom a_geom) override;
+  void EndRenderPass(FrameBuffer fb) override;
 };
 
 
@@ -118,13 +118,25 @@ void transposeMatrix(const float in_matrix[16], float out_matrix[16])
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void BatchRenderGL::Render(PipelineStateObject a_state, Geom a_geom, FrameBuffer fb)
+void BatchRenderGL::BeginRenderPass(FrameBuffer fb)
 {
   glViewport(0, 0, fb.width, fb.height);
-
   glClearColor(0,0,0,0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
 
+  // usually we don't have to actually clear framebuffer if we are not going to immediately use it 
+  // In this implementation we don't, because OpenGL render inside it's owk framebuffer. 
+  // So, we should not do anything with 'fb'
+  // In you software implementation you will likely to clear fb here unless you don't plan to use some specific internal framebuffer format and copy final image to fb at the end 
+
+  // so, you could save input fb and later just directly draw to it! 
+
+  glDisable(GL_CULL_FACE);
+  glDisable(GL_LIGHTING);
+}
+
+void BatchRenderGL::Draw(PipelineStateObject a_state, Geom a_geom)
+{
   float tempMat[16];  
   glMatrixMode(GL_PROJECTION);
   transposeMatrix(a_state.projMatrix, tempMat);      // GL assume col-major matrices (which is usually better), while in our API thet are row-major
@@ -135,15 +147,20 @@ void BatchRenderGL::Render(PipelineStateObject a_state, Geom a_geom, FrameBuffer
   glLoadMatrixf(tempMat);
 
   glDisable(GL_TEXTURE_2D);
-  glDisable(GL_LIGHTING);
   
   glEnableClientState(GL_COLOR_ARRAY);
   glEnableClientState(GL_VERTEX_ARRAY);
 
   glColorPointer (4, GL_FLOAT, 0,  a_geom.vcol4f);
-  glVertexPointer(4, GL_FLOAT, 0,  a_geom.vpos4f);
-  glDrawArrays   (GL_TRIANGLES, 0, a_geom.primsNum*3);
+  glVertexPointer(4, GL_FLOAT, 0,  a_geom.vpos4f);  
+  glDrawElements(GL_TRIANGLES, a_geom.primsNum*3, GL_UNSIGNED_INT, a_geom.indices);
 
+  glDisableClientState(GL_COLOR_ARRAY);
+  glDisableClientState(GL_VERTEX_ARRAY);
+}
+
+void BatchRenderGL::EndRenderPass(FrameBuffer fb)
+{
   glFlush();
   glReadPixels(0, 0, fb.width, fb.height, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)fb.data);
 }

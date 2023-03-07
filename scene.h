@@ -3,14 +3,21 @@
 #include <cstdint>
 #include <vector>
 
-struct SimpleScene
+struct InstanceInfo
 {
   float worldViewMatrix[16]; 
-  float projMatrix[16];      
-  std::vector<float> vpos4f;
-  std::vector<float> vcol4f;
-  std::vector<float> vtex2f;
-  std::vector<uint32_t> indices;
+  float projMatrix[16];     
 };
 
-SimpleScene CreateSimpleTriangle();
+struct SimpleScene
+{
+  std::vector<float>    vpos4f;
+  std::vector<float>    vcol4f;
+  std::vector<float>    vtex2f;
+  std::vector<uint32_t> indices;
+
+  std::vector<InstanceInfo> instances;
+};
+
+std::vector<SimpleScene> scn01_colored_triangle();
+std::vector<SimpleScene> scn02_tri_and_quad();
