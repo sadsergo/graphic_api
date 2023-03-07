@@ -170,10 +170,10 @@ void BatchRenderGL::Draw(PipelineStateObject a_state, Geom a_geom)
   else
   {
     glDisable(GL_TEXTURE_2D);
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY_SIZE);
+    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
   }
 
-  glEnableClientState(GL_TEXTURE_COORD_ARRAY_SIZE);
+  glEnableClientState(GL_TEXTURE_COORD_ARRAY);
   glEnableClientState(GL_COLOR_ARRAY);
   glEnableClientState(GL_VERTEX_ARRAY);
 
