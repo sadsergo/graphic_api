@@ -12,8 +12,6 @@ endif()
 
 find_package(OpenMP)
 
-include_directories(${Vulkan_INCLUDE_DIR})
-
 
 #uncomment this to detect broken memory problems via gcc sanitizers
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize-address-use-after-scope -fno-omit-frame-pointer -fsanitize=leak -fsanitize=undefined -fsanitize=bounds-strict")
@@ -21,7 +19,11 @@ include_directories(${Vulkan_INCLUDE_DIR})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
 
 add_executable(testapp main.cpp 
-                       Bitmap.cpp)
+                       Bitmap.cpp
+                       lgapi_ref.cpp
+                       scene.cpp)
 
 set_target_properties(testapp PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
-target_link_libraries(testapp LINK_PUBLIC OpenMP::OpenMP_CXX)
+target_link_libraries(testapp LINK_PUBLIC OpenMP::OpenMP_CXX 
+                                          X11 GL GLU glut) # for reference implementation only!
+
