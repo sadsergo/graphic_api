@@ -11,9 +11,9 @@ struct BatchRenderGL : public IBatchRender
 {
   ~BatchRenderGL() override { ExitProgram(); }
   
-  void BeginRenderPass(FrameBuffer fb) override;
+  void BeginRenderPass(Image2D fb) override;
   void Draw(PipelineStateObject a_state, Geom a_geom) override;
-  void EndRenderPass(FrameBuffer fb) override;
+  void EndRenderPass(Image2D fb) override;
 };
 
 
@@ -118,7 +118,7 @@ void transposeMatrix(const float in_matrix[16], float out_matrix[16])
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void BatchRenderGL::BeginRenderPass(FrameBuffer fb)
+void BatchRenderGL::BeginRenderPass(Image2D fb)
 {
   glViewport(0, 0, fb.width, fb.height);
   glClearColor(0,0,0,0);
@@ -133,6 +133,7 @@ void BatchRenderGL::BeginRenderPass(FrameBuffer fb)
 
   glDisable(GL_CULL_FACE);
   glDisable(GL_LIGHTING);
+  glEnable (GL_DEPTH_TEST);
 }
 
 void BatchRenderGL::Draw(PipelineStateObject a_state, Geom a_geom)
@@ -159,7 +160,7 @@ void BatchRenderGL::Draw(PipelineStateObject a_state, Geom a_geom)
   glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void BatchRenderGL::EndRenderPass(FrameBuffer fb)
+void BatchRenderGL::EndRenderPass(Image2D fb)
 {
   glFlush();
   glReadPixels(0, 0, fb.width, fb.height, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*)fb.data);

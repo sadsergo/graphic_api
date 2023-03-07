@@ -25,10 +25,10 @@ struct Geom
   GEOM_TYPE    geomType = GEOM_TRIANGLES;
 };
 
-struct FrameBuffer
+struct Image2D
 {
-  FrameBuffer(){}
-  FrameBuffer(unsigned int w, unsigned int h, unsigned int* a_data) : data(a_data), width(w), height(h) {}
+  Image2D(){}
+  Image2D(unsigned int w, unsigned int h, unsigned int* a_data) : data(a_data), width(w), height(h) {}
 
   unsigned int* data;   ///< access pixel(x,y) as data[y*width+x]
   unsigned int  width;
@@ -40,7 +40,7 @@ struct IBatchRender
   IBatchRender(){}
   virtual ~IBatchRender(){}
   
-  virtual void BeginRenderPass(FrameBuffer fb) = 0;
+  virtual void BeginRenderPass(Image2D fb) = 0;
   virtual void Draw(PipelineStateObject a_state, Geom a_geom) = 0;
-  virtual void EndRenderPass(FrameBuffer fb) = 0;
+  virtual void EndRenderPass(Image2D fb) = 0;
 };

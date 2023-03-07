@@ -39,7 +39,7 @@ int main(int argc, const char** argv)
   const uint32_t WIN_HEIGHT = 512;
 
   std::vector<uint32_t> pixelData(WIN_WIDTH*WIN_HEIGHT);
-  FrameBuffer fb(WIN_WIDTH, WIN_HEIGHT, pixelData.data());
+  Image2D fb(WIN_WIDTH, WIN_HEIGHT, pixelData.data());
 
   std::shared_ptr<IBatchRender> pRender = MakeReferenceImpl();
   std::string imgName = "wref_";
@@ -75,6 +75,23 @@ int main(int argc, const char** argv)
     std::cout << "test_02: " << time << " ms" << std::endl;
 
     std::string name = imgName + "02.bmp";  
+    SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
+  }
+
+  // test #03
+  {
+    auto objects = scn03_pyr_and_cube();
+    auto before  = std::chrono::high_resolution_clock::now();
+    
+    pRender->BeginRenderPass(fb);
+    for(const auto& obj : objects)
+      DrawInstances(obj, pRender, MODE_FILL_COLOR);
+    pRender->EndRenderPass(fb);
+
+    float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
+    std::cout << "test_03: " << time << " ms" << std::endl;
+
+    std::string name = imgName + "03.bmp";  
     SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
   }
 

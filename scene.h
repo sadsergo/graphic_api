@@ -21,3 +21,4 @@ struct SimpleScene
 
 std::vector<SimpleScene> scn01_colored_triangle();
 std::vector<SimpleScene> scn02_tri_and_quad();
+std::vector<SimpleScene> scn03_pyr_and_cube();
