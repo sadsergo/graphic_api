@@ -147,7 +147,39 @@ int main(int argc, const char** argv)
     SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
   }
 
+  // test #06
+  {
+    auto objects = scn06_teapot(testTexId, mosaicTexId);
+    auto before  = std::chrono::high_resolution_clock::now();
+    
+    pRender->BeginRenderPass(fb);
+    for(const auto& obj : objects)
+      DrawInstances(obj, pRender, MODE_TEXURE_3D);
+    pRender->EndRenderPass(fb);
 
+    float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
+    std::cout << "test_06: " << time << " ms" << std::endl;
+
+    std::string name = imgName + "06.bmp";  
+    SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
+  }
+
+  // test #07
+  {
+    auto objects = scn07_teapots_many(testTexId, mosaicTexId);
+    auto before  = std::chrono::high_resolution_clock::now();
+    
+    pRender->BeginRenderPass(fb);
+    for(const auto& obj : objects)
+      DrawInstances(obj, pRender, MODE_TEXURE_3D);
+    pRender->EndRenderPass(fb);
+
+    float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
+    std::cout << "test_07: " << time << " ms" << std::endl;
+
+    std::string name = imgName + "07.bmp";  
+    SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
+  }
 
   return 0;
 }

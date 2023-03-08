@@ -29,7 +29,10 @@ std::vector<SimpleScene> scn02_tri_and_quad();
 std::vector<SimpleScene> scn03_pyr_and_cube();
 std::vector<SimpleScene> scn04_cube(uint32_t a_texId);
 std::vector<SimpleScene> scn05_cubes_many(uint32_t a_texId1, uint32_t a_texId2, uint32_t a_texId3);
+std::vector<SimpleScene> scn06_teapot(uint32_t a_texId1, uint32_t a_texId2);
+std::vector<SimpleScene> scn07_teapots_many(uint32_t a_texId1, uint32_t a_texId2);
 
 GeomStorage make_plane();
 GeomStorage make_cube();
 GeomStorage make_pyramid();
+GeomStorage make_teapot();

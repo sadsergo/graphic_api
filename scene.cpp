@@ -1,5 +1,7 @@
 #include "scene.h"
 #include <cstring>
+#include <fstream>
+
 
 std::vector<SimpleScene> scn01_colored_triangle()
 {
@@ -331,6 +333,173 @@ std::vector<SimpleScene> scn05_cubes_many(uint32_t a_texId1, uint32_t a_texId2, 
 
   memcpy(res[2].instances[5].worldViewMatrix, cube5World, sizeof(cube5World));
   memcpy(res[2].instances[5].projMatrix,      projM,      sizeof(projM));
+
+  return res;
+}
+
+GeomStorage make_teapot()
+{
+  GeomStorage geom;
+  geom.vpos4f.resize(12288*4);  
+  geom.vcol4f.resize(12288*4);  
+  geom.vtex2f.resize(12288*2);  
+  geom.indices.resize(12288);
+
+  std::ifstream fin;
+  fin.open("data/chunk_1.bin", std::ios::binary);
+  fin.read((char*)geom.vpos4f.data(), geom.vpos4f.size() * sizeof(float));
+  fin.close();
+
+  fin.open("data/chunk_2.bin", std::ios::binary);
+  fin.read((char*)geom.vcol4f.data(), geom.vcol4f.size() * sizeof(float));
+  fin.close();
+
+  fin.open("data/chunk_3.bin", std::ios::binary);
+  fin.read((char*)geom.vtex2f.data(), geom.vtex2f.size() * sizeof(float));
+  fin.close();
+
+  fin.open("data/chunk_4.bin", std::ios::binary);
+  fin.read((char*)geom.indices.data(), geom.indices.size() * sizeof(unsigned));
+  fin.close();
+
+  return geom;
+}
+
+
+std::vector<SimpleScene> scn06_teapot(uint32_t a_texId1, uint32_t a_texId2)
+{
+  float projM[16] = {2.41421, 0, 0, 0, 
+                     0, 2.41421, 0, 0, 
+                     0, 0, -1.002, -0.2002, 
+                     0, 0, -1, 0 };
+
+  float planeWorld[16] = {3, 0, 0, 0, 
+                          0, 2.81908, -1.02606, 2.31908, 
+                          0, 1.02606, 2.81908, -3.97394, 
+                          0, 0, 0, 1};
+  
+  float teapotWorld[16] = {1, 0, 0, 0, 
+                           0, 0.939693, -0.34202, -0.5, 
+                           0, 0.34202, 0.939693, -5, 
+                           0, 0, 0, 1 };
+
+  std::vector<SimpleScene> res;
+  res.resize(2);
+  
+  res[0].geom     = make_plane();
+  res[0].textures = {a_texId1};
+  res[0].instances.resize(1);
+
+  memcpy(res[0].instances[0].worldViewMatrix, planeWorld, sizeof(planeWorld));
+  memcpy(res[0].instances[0].projMatrix,      projM,      sizeof(projM));
+
+  res[1].geom     = make_teapot();
+  res[1].textures = {a_texId2};
+  res[1].instances.resize(1);
+
+  memcpy(res[1].instances[0].worldViewMatrix, teapotWorld, sizeof(teapotWorld));
+  memcpy(res[1].instances[0].projMatrix,      projM,       sizeof(projM));
+
+  return res;
+}
+
+std::vector<SimpleScene> scn07_teapots_many(uint32_t a_texId1, uint32_t a_texId2)
+{
+  float projM[16] = {2.41421, 0, 0, 0, 
+                     0, 2.41421, 0, 0, 
+                     0, 0, -1.002, -0.2002, 
+                     0, 0, -1, 0 };
+
+  float planeWorld[16] = {-2.59808, 0, 1.5, 0, 
+                          0.51303, 2.81908, 0.888594, 3.31908, 
+                          -1.40954, 1.02606, -2.44139, -3.97394, 
+                          0, 0, 0, 1};
+  
+  float teapotWorld0[16] = {-0.433013, 0, 0.25, 0.732051, 
+                            0.085505, 0.469846, 0.148099, -0.434416, 
+                            -0.234923, 0.17101, -0.406899, -2.43271, 
+                            0, 0, 0, 1 };
+
+  float teapotWorld1[16] = {-0.433013, 0, 0.25, 1.73205, 
+                             0.085505, 0.469846, 0.148099, 0.15798, 
+                             -0.234923, 0.17101, -0.406899, -4.06031, 
+                             0, 0, 0, 1};
+  
+  float teapotWorld2[16] = {-0.433013, 0, 0.25, 2.73205, 
+                             0.085505, 0.469846, 0.148099, 0.750376, 
+                             -0.234923, 0.17101, -0.406899, -5.6879, 
+                             0, 0, 0, 1 };
+  
+  float teapotWorld3[16] = {-0.433013, 0, 0.25, -1, 
+                            0.085505, 0.469846, 0.148099, -0.0923962, 
+                            -0.234923, 0.17101, -0.406899, -3.3724, 
+                            0, 0, 0, 1 };
+
+  float teapotWorld4[16] = {-0.433013, 0, 0.25, 0, 
+                             0.085505, 0.469846, 0.148099, 0.5, 
+                             -0.234923, 0.17101, -0.406899, -5, 
+                             0, 0, 0, 1};
+
+  float teapotWorld5[16] = {-0.433013, 0, 0.25, 1, 
+                             0.085505, 0.469846, 0.148099, 1.0924, 
+                             -0.234923, 0.17101, -0.406899, -6.62759, 
+                             0, 0, 0, 1 };
+
+  float teapotWorld6[16] = {-0.433013, 0, 0.25, -2.73205, 
+                            0.085505, 0.469846, 0.148099, 0.249624, 
+                            -0.234923, 0.17101, -0.406899, -4.3121, 
+                            0, 0, 0, 1 };
+ 
+  float teapotWorld7[16] = {-0.433013, 0, 0.25, -1.73205, 
+                            0.085505, 0.469846, 0.148099, 0.84202, 
+                            -0.234923, 0.17101, -0.406899, -5.93969, 
+                            0, 0, 0, 1 };
+
+  float teapotWorld8[16] = {-0.433013, 0, 0.25, -0.732051, 
+                            0.085505, 0.469846, 0.148099, 1.43442, 
+                            -0.234923, 0.17101, -0.406899, -7.56729, 
+                            0, 0, 0, 1 };
+
+  std::vector<SimpleScene> res;
+  res.resize(2);
+  
+  res[0].geom     = make_plane();
+  res[0].textures = {a_texId1};
+  res[0].instances.resize(1);
+
+  memcpy(res[0].instances[0].worldViewMatrix, planeWorld, sizeof(planeWorld));
+  memcpy(res[0].instances[0].projMatrix,      projM,      sizeof(projM));
+
+  res[1].geom     = make_teapot();
+  res[1].textures = {a_texId2, a_texId2, a_texId2, a_texId2, a_texId2, a_texId2, a_texId2, a_texId2, a_texId2};
+  res[1].instances.resize(9);
+
+  memcpy(res[1].instances[0].worldViewMatrix, teapotWorld0, sizeof(teapotWorld0));
+  memcpy(res[1].instances[0].projMatrix,      projM,        sizeof(projM));
+
+  memcpy(res[1].instances[1].worldViewMatrix, teapotWorld1, sizeof(teapotWorld1));
+  memcpy(res[1].instances[1].projMatrix,      projM,        sizeof(projM));
+
+  memcpy(res[1].instances[2].worldViewMatrix, teapotWorld2, sizeof(teapotWorld2));
+  memcpy(res[1].instances[2].projMatrix,      projM,        sizeof(projM));
+
+  memcpy(res[1].instances[3].worldViewMatrix, teapotWorld3, sizeof(teapotWorld3));
+  memcpy(res[1].instances[3].projMatrix,      projM,        sizeof(projM));
+
+  memcpy(res[1].instances[4].worldViewMatrix, teapotWorld4, sizeof(teapotWorld4));
+  memcpy(res[1].instances[4].projMatrix,      projM,        sizeof(projM));
+
+  memcpy(res[1].instances[5].worldViewMatrix, teapotWorld5, sizeof(teapotWorld5));
+  memcpy(res[1].instances[5].projMatrix,      projM,        sizeof(projM));
+  
+  memcpy(res[1].instances[6].worldViewMatrix, teapotWorld6, sizeof(teapotWorld6));
+  memcpy(res[1].instances[6].projMatrix,      projM,        sizeof(projM));
+
+  memcpy(res[1].instances[7].worldViewMatrix, teapotWorld7, sizeof(teapotWorld7));
+  memcpy(res[1].instances[7].projMatrix,      projM,        sizeof(projM));
+
+  memcpy(res[1].instances[8].worldViewMatrix, teapotWorld8, sizeof(teapotWorld8));
+  memcpy(res[1].instances[8].projMatrix,      projM,        sizeof(projM));
 
   return res;
 }
