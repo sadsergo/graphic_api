@@ -1,4 +1,5 @@
 #include "scene.h"
+#include "Bitmap.h"
 #include <cstring>
 #include <fstream>
 
@@ -500,6 +501,157 @@ std::vector<SimpleScene> scn07_teapots_many(uint32_t a_texId1, uint32_t a_texId2
 
   memcpy(res[1].instances[8].worldViewMatrix, teapotWorld8, sizeof(teapotWorld8));
   memcpy(res[1].instances[8].projMatrix,      projM,        sizeof(projM));
+
+  return res;
+}
+
+inline static void color_unpack_bgra(uint32_t packedColor, float outColor[4])
+{
+  const uint32_t red   = (packedColor & 0x00FF0000) >> 16;
+  const uint32_t green = (packedColor & 0x0000FF00) >> 8;
+  const uint32_t blue  = (packedColor & 0x000000FF) >> 0;
+  const uint32_t alpha = (packedColor & 0xFF000000) >> 24;
+  
+  outColor[0] = (1.0f / 255.0f)*(float)red;
+  outColor[1] = (1.0f / 255.0f)*(float)green;
+  outColor[2] = (1.0f / 255.0f)*(float)blue;
+  outColor[3] = (1.0f / 255.0f)*(float)alpha;
+}
+
+GeomStorage make_terrain()
+{
+  int w,h;
+  std::vector<uint32_t> heighpMap = LoadBMP("data/heightmap.bmp", &w, &h);
+
+  GeomStorage geom;
+  geom.vpos4f.resize(w*h*4);  
+  geom.vcol4f.resize(w*h*4);  
+  geom.vtex2f.resize(w*h*2);  
+  geom.indices.resize(w*h*6);
+
+  float invWidth  = 1.0f/float(w);
+  float invHeight = 1.0f/float(h);
+
+  float cornerLeftX = float(w) / 2.0f;
+  float cornerLeftY = 0.0;
+  float cornerLeftZ = float(h) / 2.0f;
+  
+  size_t triTop = 0;
+  for (int y = 0; y < h; y++)
+  {
+      int y0 = y;
+      int y1 = y + 1;
+      if (y1 >= h) y1 = y;
+
+      for (int x = 0; x < w; x++)
+      {
+        int x0 = x;
+        int x1 = x + 1;
+        if (x1 >= w) x1 = x;
+
+        const int id0 = y0*w + x0;
+        const int id1 = y0*w + x1;
+        const int id2 = y1*w + x0;
+        const int id3 = y1*w + x1;
+
+        const int px0 = heighpMap[id0];
+        const int px1 = heighpMap[id1];
+        const int px2 = heighpMap[id2];
+        const int px3 = heighpMap[id3];
+        
+        float px0f[4];
+        float px1f[4];
+        float px2f[4];
+        float px3f[4];
+        color_unpack_bgra(px0, px0f);
+        color_unpack_bgra(px1, px1f);
+        color_unpack_bgra(px2, px2f);
+        color_unpack_bgra(px3, px3f);
+
+        const float h0 = px0f[0] + px0f[1] + px0f[2];
+        const float h1 = px1f[0] + px1f[1] + px1f[2];
+        const float h2 = px2f[0] + px2f[1] + px2f[2];
+        const float h3 = px3f[0] + px3f[1] + px3f[2];
+
+        geom.vpos4f[4*id0 + 0] = (float)x0 - cornerLeftX;
+        geom.vpos4f[4*id0 + 1] = h0        - cornerLeftY;
+        geom.vpos4f[4*id0 + 2] = (float)y0 - cornerLeftZ;
+        geom.vpos4f[4*id0 + 3] = 1.0f;
+
+        geom.vpos4f[4*id1 + 0] = (float)x1 - cornerLeftX;
+        geom.vpos4f[4*id1 + 1] = h1        - cornerLeftY;  
+        geom.vpos4f[4*id1 + 2] = (float)y0 - cornerLeftZ;
+        geom.vpos4f[4*id1 + 3] = 1.0f;
+
+        geom.vpos4f[4*id2 + 0] = (float)x0 - cornerLeftX;
+        geom.vpos4f[4*id2 + 1] = h2        - cornerLeftY;  
+        geom.vpos4f[4*id2 + 2] = (float)y1 - cornerLeftZ;
+        geom.vpos4f[4*id2 + 3] = 1.0f;
+
+        geom.vpos4f[4*id3 + 0] = (float)x1 - cornerLeftX;
+        geom.vpos4f[4*id3 + 1] = h3        - cornerLeftY;  
+        geom.vpos4f[4*id3 + 2] = (float)y1 - cornerLeftZ;
+        geom.vpos4f[4*id3 + 3] = 1.0f;
+        
+        for(int i=0;i<4;i++)
+        {
+          geom.vcol4f[4*id0 + i] = 1.0f;
+          geom.vcol4f[4*id1 + i] = 1.0f;
+          geom.vcol4f[4*id2 + i] = 1.0f;
+          geom.vcol4f[4*id3 + i] = 1.0f;
+        }
+
+        geom.vtex2f[id0*2+0] = ((float)x0)*invWidth;
+        geom.vtex2f[id0*2+1] = ((float)y0)*invWidth;
+
+        geom.vtex2f[id1*2+0] = ((float)x1)*invWidth;
+        geom.vtex2f[id1*2+1] = ((float)y0)*invWidth;
+
+        geom.vtex2f[id2*2+0] = ((float)x0)*invWidth;
+        geom.vtex2f[id2*2+1] = ((float)y1)*invWidth;
+
+        geom.vtex2f[id3*2+0] = ((float)x1)*invWidth;
+        geom.vtex2f[id3*2+1] = ((float)y1)*invWidth;
+        
+        if (x != w - 1 && y != h - 1)
+        {
+          geom.indices[triTop + 0] = id0;
+          geom.indices[triTop + 1] = id2;
+          geom.indices[triTop + 2] = id1;
+
+          geom.indices[triTop + 3] = id1;
+          geom.indices[triTop + 4] = id2;
+          geom.indices[triTop + 5] = id3;
+          triTop += 6;
+        }
+      }
+  }
+
+
+  return geom;
+}
+
+std::vector<SimpleScene> scn08_terrain(uint32_t a_texId1)
+{
+  float projM[16] = {2.41421, 0, 0, 0, 
+                     0, 2.41421, 0, 0, 
+                     0, 0, -1.002, -0.2002, 
+                     0, 0, -1, 0 };
+
+  float terrainWorld[16] = {0.0625, 0, 0, 0, 
+                            0, 0.906308, -0.0264136, 0, 
+                            0, 0.422618, 0.0566442, -15, 
+                            0, 0, 0, 1 };
+
+  std::vector<SimpleScene> res;
+  res.resize(1);
+  
+  res[0].geom     = make_terrain();
+  res[0].textures = {a_texId1};
+  res[0].instances.resize(1);
+
+  memcpy(res[0].instances[0].worldViewMatrix, terrainWorld, sizeof(terrainWorld));
+  memcpy(res[0].instances[0].projMatrix,      projM,        sizeof(projM));
 
   return res;
 }

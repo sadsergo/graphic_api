@@ -97,10 +97,12 @@ void ExitProgram()
   exit(0);
 }
 
+extern uint32_t WIN_WIDTH ;
+extern uint32_t WIN_HEIGHT;
 
 std::shared_ptr<IRender> MakeReferenceImpl() 
 { 
-  CreateWindow(512,512);
+  CreateWindow(WIN_WIDTH,WIN_HEIGHT);
   SetupGL();
 
   XGetWindowAttributes(dpy, win, &wa);
@@ -109,7 +111,7 @@ std::shared_ptr<IRender> MakeReferenceImpl()
   return std::make_shared<BatchRenderGL>(); 
 };
 
-void transposeMatrix(const float in_matrix[16], float out_matrix[16])
+static void transposeMatrix(const float in_matrix[16], float out_matrix[16])
 {
   for(int i=0;i<4;i++)
     for(int j=0;j<4;j++)

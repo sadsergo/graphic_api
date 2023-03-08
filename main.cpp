@@ -10,7 +10,8 @@
 #include "lgapi.h"
 #include "scene.h"
 
-std::shared_ptr<IRender> MakeReferenceImpl();
+std::shared_ptr<IRender> MakeReferenceImpl(); ///< reference implementation via OpenGL
+std::shared_ptr<IRender> MakeMyImpl();        ///< your implementation
 
 void DrawInstances(const SimpleScene& scn, std::shared_ptr<IRender> pRender, RENDER_MODE a_mode)
 {
@@ -36,19 +37,24 @@ void DrawInstances(const SimpleScene& scn, std::shared_ptr<IRender> pRender, REN
   }
 }
 
+uint32_t WIN_WIDTH  = 1024;
+uint32_t WIN_HEIGHT = 1024;
 
 int main(int argc, const char** argv)
 {
-  const uint32_t WIN_WIDTH  = 512;
-  const uint32_t WIN_HEIGHT = 512;
-
   std::vector<uint32_t> pixelData(WIN_WIDTH*WIN_HEIGHT);
   Image2D fb(WIN_WIDTH, WIN_HEIGHT, pixelData.data());
-
+  
+  #ifdef USE_OPENGL
   std::shared_ptr<IRender> pRender = MakeReferenceImpl();
   std::string imgName = "wref_";
+  #else
+  std::shared_ptr<IRender> pRender = MakeMyImpl();
+  std::string imgName = "zout_";
+  #endif
+
   
-  uint32_t testTexId, mosaicTexId, bricksTexId;
+  uint32_t testTexId, mosaicTexId, bricksTexId, terrainTex;
   {
     int w, h;
     std::vector<unsigned> pixels;
@@ -60,6 +66,9 @@ int main(int argc, const char** argv)
   
     pixels      = LoadBMP("data/red_brick.bmp", &w, &h);
     bricksTexId = pRender->AddImage(Image2D(w,h,pixels.data()));
+
+    pixels      = LoadBMP("data/terrain.bmp", &w, &h);
+    terrainTex  = pRender->AddImage(Image2D(w,h,pixels.data()));
   }
 
   // test #01
@@ -178,6 +187,23 @@ int main(int argc, const char** argv)
     std::cout << "test_07: " << time << " ms" << std::endl;
 
     std::string name = imgName + "07.bmp";  
+    SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
+  }
+
+  // test #08
+  {
+    auto objects = scn08_terrain(terrainTex);
+    auto before  = std::chrono::high_resolution_clock::now();
+    
+    pRender->BeginRenderPass(fb);
+    for(const auto& obj : objects)
+      DrawInstances(obj, pRender, MODE_TEXURE_3D);
+    pRender->EndRenderPass(fb);
+
+    float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
+    std::cout << "test_08: " << time << " ms" << std::endl;
+
+    std::string name = imgName + "08.bmp";  
     SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
   }
 
