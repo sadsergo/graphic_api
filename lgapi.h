@@ -5,8 +5,8 @@ enum RENDER_MODE { MODE_VERT_COLOR = 0,
 
 struct PipelineStateObject
 {
-  float worldViewMatrix[16]; ///< by rows, i.e. M[0], M[1], M[2], M[3] is the first row of the matrix
-  float projMatrix[16];      ///< by rows, i.e. M[0], M[1], M[2], M[3] is the first row of the matrix
+  float worldViewMatrix[16]; ///< assume row-major layout, i.e. M[0], M[1], M[2], M[3] is the first row of the matrix
+  float projMatrix[16];      ///< assume row-major layout, i.e. M[0], M[1], M[2], M[3] is the first row of the matrix
   RENDER_MODE  mode  = MODE_VERT_COLOR;
   unsigned int imgId = 0;
 };

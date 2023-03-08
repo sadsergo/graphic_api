@@ -12,15 +12,15 @@
 
 std::shared_ptr<IRender> MakeReferenceImpl();
 
-void DrawInstances(const SimpleScene& scn, std::shared_ptr<IRender> pRender, RENDER_MODE a_mode, unsigned int a_texId = 0)
+void DrawInstances(const SimpleScene& scn, std::shared_ptr<IRender> pRender, RENDER_MODE a_mode)
 {
   Geom  geom;
-  geom.vpos4f   = scn.vpos4f.data();
-  geom.vcol4f   = scn.vcol4f.data();
-  geom.vtex2f   = scn.vtex2f.data();
-  geom.indices  = scn.indices.data();
-  geom.vertNum  = uint32_t(scn.vpos4f.size()/4);
-  geom.primsNum = uint32_t(scn.indices.size()/3);
+  geom.vpos4f   = scn.geom.vpos4f.data();
+  geom.vcol4f   = scn.geom.vcol4f.data();
+  geom.vtex2f   = scn.geom.vtex2f.data();
+  geom.indices  = scn.geom.indices.data();
+  geom.vertNum  = uint32_t(scn.geom.vpos4f.size()/4);
+  geom.primsNum = uint32_t(scn.geom.indices.size()/3);
 
   for(size_t instId = 0; instId < scn.instances.size(); instId++)
   {
@@ -28,7 +28,10 @@ void DrawInstances(const SimpleScene& scn, std::shared_ptr<IRender> pRender, REN
     memcpy(pso.worldViewMatrix, scn.instances[instId].worldViewMatrix, sizeof(pso.worldViewMatrix));
     memcpy(pso.projMatrix,      scn.instances[instId].projMatrix,      sizeof(pso.projMatrix));
     pso.mode  = a_mode;
-    pso.imgId = a_texId;
+    if(instId < scn.textures.size())     // do we have texture for this instance?
+      pso.imgId = scn.textures[instId];  
+    else
+      pso.imgId = uint32_t(-1);          
     pRender->Draw(pso, geom);
   }
 }
@@ -45,10 +48,19 @@ int main(int argc, const char** argv)
   std::shared_ptr<IRender> pRender = MakeReferenceImpl();
   std::string imgName = "wref_";
   
-  int w, h;
-  std::vector<unsigned> pixels = LoadBMP("data/texture1.bmp", &w, &h);
+  uint32_t testTexId, mosaicTexId, bricksTexId;
+  {
+    int w, h;
+    std::vector<unsigned> pixels;
+    pixels      = LoadBMP("data/texture1.bmp", &w, &h);
+    testTexId   = pRender->AddImage(Image2D(w,h,pixels.data()));
   
-  auto testTexId = pRender->AddImage(Image2D(w,h,pixels.data()));
+    pixels      = LoadBMP("data/mosaic.bmp", &w, &h);
+    mosaicTexId = pRender->AddImage(Image2D(w,h,pixels.data()));
+  
+    pixels      = LoadBMP("data/red_brick.bmp", &w, &h);
+    bricksTexId = pRender->AddImage(Image2D(w,h,pixels.data()));
+  }
 
   // test #01
   {
@@ -103,12 +115,12 @@ int main(int argc, const char** argv)
 
   // test #04
   {
-    auto objects = scn04_cube();
+    auto objects = scn04_cube(testTexId);
     auto before  = std::chrono::high_resolution_clock::now();
     
     pRender->BeginRenderPass(fb);
     for(const auto& obj : objects)
-      DrawInstances(obj, pRender, MODE_TEXURE_3D, testTexId);
+      DrawInstances(obj, pRender, MODE_TEXURE_3D);
     pRender->EndRenderPass(fb);
 
     float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
@@ -117,6 +129,25 @@ int main(int argc, const char** argv)
     std::string name = imgName + "04.bmp";  
     SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
   }
+
+  // test #05
+  {
+    auto objects = scn05_cubes_many(testTexId, mosaicTexId, bricksTexId);
+    auto before  = std::chrono::high_resolution_clock::now();
+    
+    pRender->BeginRenderPass(fb);
+    for(const auto& obj : objects)
+      DrawInstances(obj, pRender, MODE_TEXURE_3D);
+    pRender->EndRenderPass(fb);
+
+    float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
+    std::cout << "test_05: " << time << " ms" << std::endl;
+
+    std::string name = imgName + "05.bmp";  
+    SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
+  }
+
+
 
   return 0;
 }
