@@ -9,6 +9,10 @@
 #include "Bitmap.h"
 #include "lgapi.h"
 #include "scene.h"
+#include "external/LiteMath/Image2d.h"
+
+using namespace LiteMath;
+using namespace std;
 
 std::shared_ptr<IRender> MakeReferenceImpl(); ///< reference implementation via OpenGL
 std::shared_ptr<IRender> MakeMyImpl();        ///< your implementation

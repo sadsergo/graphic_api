@@ -1,5 +1,12 @@
 #pragma once 
 
+#include <vector>
+#include <memory>
+#include "external/LiteMath/Image2d.h"
+
+using namespace LiteMath;
+using namespace std;
+
 enum RENDER_MODE { MODE_VERT_COLOR = 0,
                    MODE_TEXURE_3D  = 1, };
 
@@ -45,4 +52,21 @@ struct IRender
   virtual void BeginRenderPass(Image2D fb) = 0;
   virtual void Draw(PipelineStateObject a_state, Geom a_geom) = 0;
   virtual void EndRenderPass(Image2D fb) = 0;
+};
+
+struct TextureContainer
+{
+	std::vector<Image2D> textures;
+
+	size_t size()
+	{
+		return textures.size();
+	}
+
+	size_t addTexture(const Image2D& tex)
+	{
+		textures.push_back(tex);
+
+		return textures.size() - 1;
+	}
 };

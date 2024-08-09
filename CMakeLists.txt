@@ -1,17 +1,20 @@
 cmake_minimum_required (VERSION 3.8)
-project (gapi_test)
+project (gapi)
+
+message("Building project")
 
 option(USE_OPENGL "Use reference OpenGL implementation" OFF)
 
 # get rid of annoying MSVC warnings.
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD 11)
 
 if(USE_OPENGL)
   add_definitions(-DUSE_OPENGL)
 endif()
 
-include_directories(".")
+include_directories(./ external/LiteMath)
+
 if(WIN32)
   link_directories(${ADDITIONAL_LIBRARY_DIRS})
 endif()
@@ -24,21 +27,22 @@ find_package(OpenMP)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
 
 if(USE_OPENGL)
-add_executable(testapp main.cpp 
+add_executable(app main.cpp 
                        Bitmap.cpp
                        lgapi_ref.cpp
                        scene.cpp)
 else()
-add_executable(testapp main.cpp 
+add_executable(app main.cpp 
                        Bitmap.cpp
                        lgapi.cpp
-                       scene.cpp)
+                       scene.cpp
+                       external/LiteMath/Image2d.cpp)
 endif()
 
-set_target_properties(testapp PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+set_target_properties(app PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
 if(USE_OPENGL)
-  target_link_libraries(testapp LINK_PUBLIC OpenMP::OpenMP_CXX X11 GL GLU glut) # for reference implementation
+  target_link_libraries(app LINK_PUBLIC OpenMP::OpenMP_CXX X11 GL GLU glut) # for reference implementation
 else()
-  target_link_libraries(testapp LINK_PUBLIC OpenMP::OpenMP_CXX)                 # for your implementation
+  target_link_libraries(app LINK_PUBLIC OpenMP::OpenMP_CXX)                 # for your implementation
 endif()
