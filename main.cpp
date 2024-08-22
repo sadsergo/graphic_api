@@ -76,7 +76,7 @@ int main(int argc, const char** argv)
   }
 
   // test #01
-  {
+  /*{
     auto objects = scn01_colored_triangle();
     auto before  = std::chrono::high_resolution_clock::now();
     
@@ -90,92 +90,104 @@ int main(int argc, const char** argv)
 
     std::string name = imgName + "01.bmp";  
     SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
-  }
 
-  // test #02
-  {
-    auto objects = scn02_tri_and_quad();
-    auto before  = std::chrono::high_resolution_clock::now();
-    
-    pRender->BeginRenderPass(fb);
-    for(const auto& obj : objects)
-      DrawInstances(obj, pRender, MODE_VERT_COLOR);
-    pRender->EndRenderPass(fb);
+    std::fill(&fb.data[0], &fb.data[fb.width * fb.height - 1], 0);
+  }*/
 
-    float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
-    std::cout << "test_02: " << time << " ms" << std::endl;
+  //// test #02
+  //{
+  //  auto objects = scn02_tri_and_quad();
+  //  auto before  = std::chrono::high_resolution_clock::now();
+  //  
+  //  pRender->BeginRenderPass(fb);
+  //  for(const auto& obj : objects)
+  //    DrawInstances(obj, pRender, MODE_VERT_COLOR);
+  //  pRender->EndRenderPass(fb);
 
-    std::string name = imgName + "02.bmp";  
-    SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
-  }
+  //  float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
+  //  std::cout << "test_02: " << time << " ms" << std::endl;
 
-  // test #03
-  {
-    auto objects = scn03_pyr_and_cube();
-    auto before  = std::chrono::high_resolution_clock::now();
-    
-    pRender->BeginRenderPass(fb);
-    for(const auto& obj : objects)
-      DrawInstances(obj, pRender, MODE_VERT_COLOR);
-    pRender->EndRenderPass(fb);
+  //  std::string name = imgName + "02.bmp";  
+  //  SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
 
-    float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
-    std::cout << "test_03: " << time << " ms" << std::endl;
+  //  std::fill(&fb.data[0], &fb.data[fb.width * fb.height - 1], 0);
+  //}
 
-    std::string name = imgName + "03.bmp";  
-    SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
-  }
+  //// test #03
+  //{
+  //  auto objects = scn03_pyr_and_cube();
+  //  auto before  = std::chrono::high_resolution_clock::now();
+  //  
+  //  pRender->BeginRenderPass(fb);
+  //  for(const auto& obj : objects)
+  //    DrawInstances(obj, pRender, MODE_VERT_COLOR);
+  //  pRender->EndRenderPass(fb);
 
-  // test #04
-  {
-    auto objects = scn04_cube(testTexId);
-    auto before  = std::chrono::high_resolution_clock::now();
-    
-    pRender->BeginRenderPass(fb);
-    for(const auto& obj : objects)
-      DrawInstances(obj, pRender, MODE_TEXURE_3D);
-    pRender->EndRenderPass(fb);
+  //  float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
+  //  std::cout << "test_03: " << time << " ms" << std::endl;
 
-    float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
-    std::cout << "test_04: " << time << " ms" << std::endl;
+  //  std::string name = imgName + "03.bmp";  
+  //  SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
 
-    std::string name = imgName + "04.bmp";  
-    SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
-  }
+  //  std::fill(&fb.data[0], &fb.data[fb.width * fb.height - 1], 0);
+  //}
 
-  // test #05
-  {
-    auto objects = scn05_cubes_many(testTexId, mosaicTexId, bricksTexId);
-    auto before  = std::chrono::high_resolution_clock::now();
-    
-    pRender->BeginRenderPass(fb);
-    for(const auto& obj : objects)
-      DrawInstances(obj, pRender, MODE_TEXURE_3D);
-    pRender->EndRenderPass(fb);
+  //// test #04
+  //{
+  //  auto objects = scn04_cube(testTexId);
+  //  auto before  = std::chrono::high_resolution_clock::now();
+  //  
+  //  pRender->BeginRenderPass(fb);
+  //  for(const auto& obj : objects)
+  //    DrawInstances(obj, pRender, MODE_TEXURE_3D);
+  //  pRender->EndRenderPass(fb);
 
-    float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
-    std::cout << "test_05: " << time << " ms" << std::endl;
+  //  float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
+  //  std::cout << "test_04: " << time << " ms" << std::endl;
 
-    std::string name = imgName + "05.bmp";  
-    SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
-  }
+  //  std::string name = imgName + "04.bmp";  
+  //  SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
 
-  // test #06
-  {
-    auto objects = scn06_teapot(testTexId, mosaicTexId);
-    auto before  = std::chrono::high_resolution_clock::now();
-    
-    pRender->BeginRenderPass(fb);
-    for(const auto& obj : objects)
-      DrawInstances(obj, pRender, MODE_TEXURE_3D);
-    pRender->EndRenderPass(fb);
+  //  std::fill(&fb.data[0], &fb.data[fb.width * fb.height - 1], 0);
+  //}
 
-    float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
-    std::cout << "test_06: " << time << " ms" << std::endl;
+  //// test #05
+  //{
+  //  auto objects = scn05_cubes_many(testTexId, mosaicTexId, bricksTexId);
+  //  auto before  = std::chrono::high_resolution_clock::now();
+  //  
+  //  pRender->BeginRenderPass(fb);
+  //  for(const auto& obj : objects)
+  //    DrawInstances(obj, pRender, MODE_TEXURE_3D);
+  //  pRender->EndRenderPass(fb);
 
-    std::string name = imgName + "06.bmp";  
-    SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
-  }
+  //  float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
+  //  std::cout << "test_05: " << time << " ms" << std::endl;
+
+  //  std::string name = imgName + "05.bmp";  
+  //  SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
+
+  //  std::fill(&fb.data[0], &fb.data[fb.width * fb.height - 1], 0);
+  //}
+
+  //// test #06
+  //{
+  //  auto objects = scn06_teapot(testTexId, mosaicTexId);
+  //  auto before  = std::chrono::high_resolution_clock::now();
+  //  
+  //  pRender->BeginRenderPass(fb);
+  //  for(const auto& obj : objects)
+  //    DrawInstances(obj, pRender, MODE_TEXURE_3D);
+  //  pRender->EndRenderPass(fb);
+
+  //  float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
+  //  std::cout << "test_06: " << time << " ms" << std::endl;
+
+  //  std::string name = imgName + "06.bmp";  
+  //  SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
+
+  //  std::fill(&fb.data[0], &fb.data[fb.width * fb.height - 1], 0);
+  //}
 
   // test #07
   {
@@ -192,24 +204,28 @@ int main(int argc, const char** argv)
 
     std::string name = imgName + "07.bmp";  
     SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
+
+    std::fill(&fb.data[0], &fb.data[fb.width * fb.height - 1], 0);
   }
 
-  // test #08
-  {
-    auto objects = scn08_terrain(terrainTex);
-    auto before  = std::chrono::high_resolution_clock::now();
-    
-    pRender->BeginRenderPass(fb);
-    for(const auto& obj : objects)
-      DrawInstances(obj, pRender, MODE_TEXURE_3D);
-    pRender->EndRenderPass(fb);
+  //// test #08
+  //{
+  //  auto objects = scn08_terrain(terrainTex);
+  //  auto before  = std::chrono::high_resolution_clock::now();
+  //  
+  //  pRender->BeginRenderPass(fb);
+  //  for(const auto& obj : objects)
+  //    DrawInstances(obj, pRender, MODE_TEXURE_3D);
+  //  pRender->EndRenderPass(fb);
 
-    float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
-    std::cout << "test_08: " << time << " ms" << std::endl;
+  //  float time = std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - before).count()/1000.f;
+  //  std::cout << "test_08: " << time << " ms" << std::endl;
 
-    std::string name = imgName + "08.bmp";  
-    SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
-  }
+  //  std::string name = imgName + "08.bmp";  
+  //  SaveBMP(name.c_str(), pixelData.data(), WIN_WIDTH, WIN_HEIGHT);
+
+  //  std::fill(&fb.data[0], &fb.data[fb.width * fb.height - 1], 0);
+  //}
 
   return 0;
 }

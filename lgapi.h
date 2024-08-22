@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include "external/LiteMath/Image2d.h"
+#include <iostream>
 
 using namespace LiteMath;
 using namespace std;
@@ -47,7 +48,7 @@ struct IRender
   IRender(){}
   virtual ~IRender(){}
   
-  virtual unsigned int AddImage(Image2D a_img) = 0;
+  virtual size_t AddImage(Image2D a_img) = 0;
 
   virtual void BeginRenderPass(Image2D fb) = 0;
   virtual void Draw(PipelineStateObject a_state, Geom a_geom) = 0;
