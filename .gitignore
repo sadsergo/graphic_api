@@ -35,3 +35,6 @@
 out/ 
 .vs/
 [Bb]in/
+build/
+*.json
+.vscode

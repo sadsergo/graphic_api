@@ -3,6 +3,7 @@
 #include <cstring>
 #include <fstream>
 
+#include "parse_obj/OBJparsing.h"
 
 std::vector<SimpleScene> scn01_colored_triangle()
 {
@@ -194,7 +195,12 @@ std::vector<SimpleScene> scn03_pyr_and_cube()
 std::vector<SimpleScene> scn04_cube(uint32_t a_texId)
 {
   std::vector<SimpleScene> res;
-  res.resize(1);
+  if (a_texId == uint32_t(-1)) {
+    res.resize(2);
+  }
+  else {
+    res.resize(1);
+  }
   
   // pyramid
   //
@@ -212,8 +218,31 @@ std::vector<SimpleScene> scn04_cube(uint32_t a_texId)
   memcpy(res[0].instances[0].worldViewMatrix, worldView1, sizeof(worldView1));
   memcpy(res[0].instances[0].projMatrix,      proj1,      sizeof(proj1));
 
-  res[0].geom     = make_cube();
-  res[0].textures = {a_texId};
+  if (a_texId == uint32_t(-1)) {
+    res[0].geom.vpos4f  = {1,1,-1,1, -1,1,-1,1, -1,1,1,1, 1,1,1,1, 1,-1,1,1, -1,-1,1,1, -1,-1,-1,1, 1,-1,-1,1, 1,1,1,1, -1,1,1,1, -1,-1,1,1, 1,-1,1,1, 1,-1,-1,1, -1,-1,-1,1, -1,1,-1,1, 1,1,-1,1, -1,1,1,1, -1,1,-1,1, -1,-1,-1,1, -1,-1,1,1, 1,1,-1,1, 1,1,1,1, 1,-1,1,1, 1,-1,-1,1};
+    res[0].geom.vcol4f  = {0,1,0,0, 0,1,0,0, 0,1,0,0, 0,1,0,0, 1,0.5,0,0, 1,0.5,0,0, 1,0.5,0,0, 1,0.5,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,1,0,0, 1,1,0,0, 1,1,0,0, 1,1,0,0, 0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0};
+    res[0].geom.vtex2f  = {0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0};
+    res[0].geom.indices = {0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23};
+
+    for (int i = 0; i < res[0].geom.vpos4f.size(); i += 4) {
+      res[0].geom.vpos4f[i] = res[0].geom.vpos4f[i] / 5 + 1;
+      res[0].geom.vpos4f[i + 1] = res[0].geom.vpos4f[i + 1] / 5 + 1.7;
+      res[0].geom.vpos4f[i + 2] = res[0].geom.vpos4f[i + 2] / 5 + 0;
+    }
+
+    res[1].instances.resize(1);
+    memcpy(res[1].instances[0].worldViewMatrix, worldView1, sizeof(worldView1));
+    memcpy(res[1].instances[0].projMatrix,      proj1,      sizeof(proj1));
+    res[1].geom.vpos4f  = {1,1,-1,1, -1,1,-1,1, -1,1,1,1, 1,1,1,1, 1,-1,1,1, -1,-1,1,1, -1,-1,-1,1, 1,-1,-1,1, 1,1,1,1, -1,1,1,1, -1,-1,1,1, 1,-1,1,1, 1,-1,-1,1, -1,-1,-1,1, -1,1,-1,1, 1,1,-1,1, -1,1,1,1, -1,1,-1,1, -1,-1,-1,1, -1,-1,1,1, 1,1,-1,1, 1,1,1,1, 1,-1,1,1, 1,-1,-1,1};
+    res[1].geom.vcol4f  = {0,1,0,0, 0,1,0,0, 0,1,0,0, 0,1,0,0, 1,0.5,0,0, 1,0.5,0,0, 1,0.5,0,0, 1,0.5,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,0,0,0, 1,1,0,0, 1,1,0,0, 1,1,0,0, 1,1,0,0, 0,0,1,0, 0,0,1,0, 0,0,1,0, 0,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0, 1,0,1,0};
+    res[1].geom.vtex2f  = {0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0, 0,0};
+    res[1].geom.indices = {0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14, 15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23};
+  }
+  else {
+    res[0].geom     = make_cube();
+    res[0].textures = {a_texId};
+  }
+  
   return res;
 }
 
@@ -652,6 +681,35 @@ std::vector<SimpleScene> scn08_terrain(uint32_t a_texId1)
 
   memcpy(res[0].instances[0].worldViewMatrix, terrainWorld, sizeof(terrainWorld));
   memcpy(res[0].instances[0].projMatrix,      projM,        sizeof(projM));
+
+  return res;
+}
+
+GeomStorage 
+make_statue()
+{
+  std::string file_name = "./data/uploads_files_3425113_VenuDeMilo.obj";
+  auto statue = ObjParse(file_name);
+
+  return statue;
+}
+
+std::vector<SimpleScene> 
+scn10_statue(uint32_t a_statueId, const LiteMath::float4x4 &proj, const LiteMath::float4x4 &worldView)
+{
+  //  Load statue
+  auto statue = make_statue();
+  std::vector<SimpleScene> res;
+
+  res.resize(1);
+  res[0].instances.resize(1);
+  res[0].geom = statue;
+
+  float *perspectiveProj = (float*)(&proj);
+  float *wV = (float*)(&worldView);
+
+  memcpy(res[0].instances[0].worldViewMatrix, wV, 16 * sizeof(float));
+  memcpy(res[0].instances[0].projMatrix, perspectiveProj, 16 * sizeof(float));
 
   return res;
 }

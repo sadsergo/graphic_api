@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <vector>
 
+#include "external/LiteMath/Image2d.h"
+
 struct InstanceInfo
 {
   float worldViewMatrix[16]; ///< assume row-major layout, i.e. M[0], M[1], M[2], M[3] is the first row of the matrix
@@ -32,9 +34,11 @@ std::vector<SimpleScene> scn05_cubes_many(uint32_t a_texId1, uint32_t a_texId2, 
 std::vector<SimpleScene> scn06_teapot(uint32_t a_texId1, uint32_t a_texId2);
 std::vector<SimpleScene> scn07_teapots_many(uint32_t a_texId1, uint32_t a_texId2);
 std::vector<SimpleScene> scn08_terrain(uint32_t a_texId1);
+std::vector<SimpleScene> scn10_statue(uint32_t a_statueId, const LiteMath::float4x4 &proj, const LiteMath::float4x4 &worldView);
 
 GeomStorage make_plane();
 GeomStorage make_cube();
 GeomStorage make_pyramid();
 GeomStorage make_teapot();
 GeomStorage make_terrain();
+GeomStorage make_statue();

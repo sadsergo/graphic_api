@@ -1,23 +1,18 @@
 #pragma once 
 
 #include <vector>
-#include <memory>
-#include "external/LiteMath/Image2d.h"
+#include <cstddef>
 #include <iostream>
+#include <cmath>
 
-using namespace LiteMath;
-using namespace std;
+#include "external/LiteMath/Image2d.h"
+#include "shaders/shaders.h"
 
 enum RENDER_MODE { MODE_VERT_COLOR = 0,
                    MODE_TEXURE_3D  = 1, };
 
-struct PipelineStateObject
-{
-  float worldViewMatrix[16]; ///< assume row-major layout, i.e. M[0], M[1], M[2], M[3] is the first row of the matrix
-  float projMatrix[16];      ///< assume row-major layout, i.e. M[0], M[1], M[2], M[3] is the first row of the matrix
-  RENDER_MODE  mode  = MODE_VERT_COLOR;
-  unsigned int imgId = 0;
-};
+
+const float eps = 0.000001;
 
 enum GEOM_TYPE { GEOM_TRIANGLES = 1, GEOM_QUADS = 2 };
 
@@ -43,31 +38,44 @@ struct Image2D
   unsigned int  height; 
 };
 
+struct TextureContainer {
+  std::vector<Image2D> textures;
+
+  size_t size()
+  {
+    return textures.size();
+  }
+
+  size_t addTexture(const Image2D &tex)
+  {
+    textures.push_back(tex);
+
+    return textures.size() - 1;
+  }
+};
+
+struct PipelineStateObject
+{
+  float worldViewMatrix[16]; ///< assume row-major layout, i.e. M[0], M[1], M[2], M[3] is the first row of the matrix
+  float projMatrix[16];      ///< assume row-major layout, i.e. M[0], M[1], M[2], M[3] is the first row of the matrix
+  RENDER_MODE  mode  = MODE_VERT_COLOR;
+  unsigned int imgId = 0;
+  ShaderContainer* shaders;
+};
+
 struct IRender
 {
   IRender(){}
   virtual ~IRender(){}
   
-  virtual size_t AddImage(Image2D a_img) = 0;
+  virtual unsigned int AddImage(const Image2D &a_img) = 0;
 
-  virtual void BeginRenderPass(Image2D fb) = 0;
+  virtual void BeginRenderPass(Image2D &fb) = 0;
   virtual void Draw(PipelineStateObject a_state, Geom a_geom) = 0;
-  virtual void EndRenderPass(Image2D fb) = 0;
+  virtual void EndRenderPass(Image2D &fb) = 0;
+  virtual void AA_Draw(PipelineStateObject a_state, Geom a_geom) = 0;
+  virtual void get_tr_border(float p[3][4], int &x0, int &y0, int &x1, int &y1) = 0;
 };
 
-struct TextureContainer
-{
-	std::vector<Image2D> textures;
-
-	size_t size()
-	{
-		return textures.size();
-	}
-
-	size_t addTexture(const Image2D& tex)
-	{
-		textures.push_back(tex);
-
-		return textures.size() - 1;
-	}
-};
+std::shared_ptr<IRender> MakeReferenceImpl(); ///< reference implementation via OpenGL
+std::shared_ptr<IRender> MakeMyImpl();        ///< your implementation

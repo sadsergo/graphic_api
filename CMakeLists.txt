@@ -22,27 +22,21 @@ endif()
 find_package(OpenMP)
 
 #uncomment this to detect broken memory problems via gcc sanitizers
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize-address-use-after-scope -fno-omit-frame-pointer -fsanitize=leak -fsanitize=undefined -fsanitize=bounds-strict")
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize-address-use-after-scope -fno-omit-frame-pointer -fsanitize=leak -fsanitize=undefined -fsanitize=bounds-strict")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ")
 
-if(USE_OPENGL)
-add_executable(app main.cpp 
-                       Bitmap.cpp
-                       lgapi_ref.cpp
-                       scene.cpp)
-else()
 add_executable(app main.cpp 
                        Bitmap.cpp
                        lgapi.cpp
                        scene.cpp
+                       shaders/shaders.cpp
+                       parse_obj/OBJparsing.cpp
+                       tests/tests.cpp
+                       draw_ins.cpp
+                       subBuffer/sub_buf.cpp
                        external/LiteMath/Image2d.cpp)
-endif()
 
 set_target_properties(app PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
 
-if(USE_OPENGL)
-  target_link_libraries(app LINK_PUBLIC OpenMP::OpenMP_CXX X11 GL GLU glut) # for reference implementation
-else()
-  target_link_libraries(app LINK_PUBLIC OpenMP::OpenMP_CXX)                 # for your implementation
-endif()
+target_link_libraries(app LINK_PUBLIC OpenMP::OpenMP_CXX)                 # for your implementation
