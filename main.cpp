@@ -26,7 +26,8 @@ int main(int argc, const char** argv)
   // test_all_scenes(false);
   // test_scene(8, false);
 
-  test_intersection();
+  // test_intersection();
+  test_full_intersection();
 
   return 0;
 }

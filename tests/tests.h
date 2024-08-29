@@ -24,6 +24,7 @@ float test_scene10(bool is_AA);
 void test_all_scenes(bool is_AA);
 void test_scene(int id, bool is_AA);
 void test_intersection();
+void test_full_intersection();
 
 
 static std::vector<float(*)(bool)> scene_tests = {test_scene1, test_scene2, 

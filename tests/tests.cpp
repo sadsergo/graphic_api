@@ -409,3 +409,11 @@ test_intersection()
   }
 }
 
+void
+test_full_intersection()
+{
+  LiteMath::float2 A(2, 2), B(2, 5), C(3, 4), pixel(3, 3);
+
+  calcSubPixel(A, B, C, pixel);
+}
+

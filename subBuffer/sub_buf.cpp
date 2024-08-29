@@ -112,6 +112,11 @@ calcSubPixel(const LiteMath::float2 &A, const LiteMath::float2 &B, const LiteMat
         {
             LiteMath::float2 intersection;
             bool is_intersected = intersection_funcs[j](params[i], pixel, intersection);
+
+            if (is_intersected)
+            {
+                std::cout << intersection.x << " " << intersection.y << std::endl; 
+            }
         }
     }
 }
